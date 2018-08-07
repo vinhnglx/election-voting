@@ -24,6 +24,8 @@ App = {
     $.getJSON('Election.json', function (election) {
       App.contracts.Election = TruffleContract(election)
       App.contracts.Election.setProvider(App.web3Provider)
+
+      App.listenForEvents()
       return App.render();
     })
   },
@@ -53,6 +55,7 @@ App = {
       var candidatesResults = $('#candidatesResults')
       var candidatesSelect = $('#candidatesSelect')
       candidatesResults.empty()
+      candidatesSelect.empty()
 
       for (var i = 1; i <= candidatesCount; i++) {
         electionInstance.candidates(i).then(function (candidate) {
@@ -88,6 +91,19 @@ App = {
       $('#content').hide()
     }).catch(function (err) {
       console.error(err)
+    })
+  },
+
+  listenForEvents: function () {
+    App.contracts.Election.deployed().then(function (instance) {
+      instance.VotedEvent({}, {
+        // Subscribe event on entire blockchain from first block to the most recent block
+        fromBlock: 0,
+        toBlock: 'latest'
+      }).watch(function (err, event) {
+        console.log('event trigered', event)
+        App.render()
+      })
     })
   }
 };

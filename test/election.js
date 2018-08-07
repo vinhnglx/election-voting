@@ -30,7 +30,10 @@ contract('Election', function (accounts) {
       electionInstance = instance
       candidateId = 1
       return electionInstance.vote(candidateId, { from: accounts[0] })
-    }).then(function (receipt) {
+    }).then(function (transactionReceipt) {
+      assert.equal(transactionReceipt.logs.length, 1)
+      assert.equal(transactionReceipt.logs[0].event, 'VotedEvent')
+      assert.equal(transactionReceipt.logs[0].args._candidateId.toNumber(), candidateId)
       return electionInstance.voters(accounts[0])
     }).then(function (voted) {
       assert(voted, 'the voter was marked as voted')

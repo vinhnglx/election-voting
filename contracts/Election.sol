@@ -23,6 +23,11 @@ contract Election {
     addCandidate("Zoro");
   }
 
+  // DApps can listen the event
+  event VotedEvent (
+    uint indexed _candidateId
+  );
+
   function vote (uint _candidateId) public {
     // Require that they haven't voted before
     // require() to validate user's input before any action can be taken
@@ -38,6 +43,9 @@ contract Election {
 
     // Increate candidate voteCount
     candidates[_candidateId].voteCount++;
+
+    // Trigger VotedEvent
+    emit VotedEvent(_candidateId);
   }
 
   function addCandidate (string _name) private {
